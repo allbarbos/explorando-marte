@@ -8,38 +8,34 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var tests = []struct {
-	route, cardinal, name string
-	probes, y, x          int
-}{
-	{
-		name:     "probe 1",
-		probes:   2,
-		route:    "LMLMLMLMM",
-		x:        1,
-		y:        3,
-		cardinal: "N",
-	},
-	{
-		name:     "probe 2",
-		probes:   2,
-		route:    "MMRMMRMRRM",
-		x:        5,
-		y:        1,
-		cardinal: "E",
-	},
-}
-
 func TestInit(t *testing.T) {
-	t.Parallel()
+	var tests = []struct {
+		route, cardinal, name string
+		probes, y, x          int
+	}{
+		{
+			name:     "probe 1",
+			probes:   2,
+			route:    "LMLMLMLMM",
+			x:        1,
+			y:        3,
+			cardinal: "N",
+		},
+		{
+			name:     "probe 2",
+			probes:   2,
+			route:    "MMRMMRMRRM",
+			x:        5,
+			y:        1,
+			cardinal: "E",
+		},
+	}
 
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			file := utils.OpenFile("../cmd/input.csv")
+			file := utils.OpenFile("./testdata/input.csv")
 			defer file.Close()
-			probes := explore.Init(file)
+			probes, _ := explore.Init(file)
 
 			route := probes[i].GetRoute()
 			cardinal := probes[i].GetCardinal()
@@ -50,6 +46,60 @@ func TestInit(t *testing.T) {
 			assert.Equal(t, tt.x, x)
 			assert.Equal(t, tt.y, y)
 			assert.Equal(t, tt.cardinal, cardinal)
+		})
+	}
+}
+
+func TestInit_InvalidAxis(t *testing.T) {
+	var tests = []struct {
+		name, file, want string
+	}{
+		{
+			name: "when x-axis is invalid",
+			file: "./testdata/invalid-axis-x.csv",
+			want: `strconv.Atoi: parsing "a": invalid syntax`,
+		},
+		{
+			name: "when y-axis is invalid",
+			file: "./testdata/invalid-axis-y.csv",
+			want: `strconv.Atoi: parsing "a": invalid syntax`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			file := utils.OpenFile(tt.file)
+			defer file.Close()
+			_, err := explore.Init(file)
+
+			assert.Equal(t, tt.want, err.Error())
+		})
+	}
+}
+
+func TestInit_InvalidLimits(t *testing.T) {
+	var tests = []struct {
+		name, file, want string
+	}{
+		{
+			name: "when x limit is invalid",
+			file: "./testdata/invalid-limit-x.csv",
+			want: `strconv.Atoi: parsing "a": invalid syntax`,
+		},
+		{
+			name: "when y limit is invalid",
+			file: "./testdata/invalid-limit-y.csv",
+			want: `strconv.Atoi: parsing "a": invalid syntax`,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			file := utils.OpenFile(tt.file)
+			defer file.Close()
+			_, err := explore.Init(file)
+
+			assert.Equal(t, tt.want, err.Error())
 		})
 	}
 }

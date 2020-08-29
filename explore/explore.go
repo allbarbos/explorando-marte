@@ -6,12 +6,11 @@ import (
 	"explorando-marte/plateau"
 	p "explorando-marte/probe"
 	"explorando-marte/utils"
-	"log"
 	"os"
 	"strconv"
 )
 
-func Init(file *os.File) []p.Probe {
+func Init(file *os.File) ([]p.Probe, error) {
 	r := csv.NewReader(file)
 	c := 1
 
@@ -25,13 +24,22 @@ func Init(file *os.File) []p.Probe {
 		}
 
 		if c == 1 {
-			lx, ly := readLimits(rec)
+			lx, ly, err := readLimits(rec)
+			if err != nil {
+				return nil, err
+			}
+
 			limit.SetUpper(lx, ly)
 			c++
 			continue
 		}
 
-		card, route, x, y := readCoordinates(r, rec)
+		card, route, x, y, err := readCoordinates(r, rec)
+
+		if err != nil {
+			return nil, err
+		}
+
 		probe := p.NewProbe(card, route, x, y)
 
 		for _, r := range probe.GetRoute() {
@@ -47,35 +55,40 @@ func Init(file *os.File) []p.Probe {
 		c += 2
 	}
 
-	return probes
+	return probes, nil
 }
 
-func readCoordinates(r *csv.Reader, rec []string) (string, string, int, int) {
+func readCoordinates(r *csv.Reader, rec []string) (string, string, int, int, error) {
 	x, err := strconv.Atoi(rec[0])
-	y, err := strconv.Atoi(rec[1])
-	card := rec[2]
-
 	if err != nil {
-		log.Fatal(err)
+		return "", "", 0, 0, err
 	}
+
+	y, err := strconv.Atoi(rec[1])
+	if err != nil {
+		return "", "", 0, 0, err
+	}
+
+	card := rec[2]
 
 	rec = utils.ReadLine(r)
 	route := rec[0]
 
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	return card, route, x, y
+	return card, route, x, y, nil
 }
 
-func readLimits(rec []string) (int, int) {
+func readLimits(rec []string) (int, int, error) {
 	x, err := strconv.Atoi(rec[0])
+
+	if err != nil {
+		return 0, 0, err
+	}
+
 	y, err := strconv.Atoi(rec[1])
 
 	if err != nil {
-		log.Fatal(err)
+		return 0, 0, err
 	}
 
-	return x, y
+	return x, y, nil
 }
