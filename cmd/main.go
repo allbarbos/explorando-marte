@@ -7,8 +7,10 @@ import (
 	"log"
 )
 
+var filePath string = "input.csv"
+
 func main() {
-	file := utils.OpenFile("input.csv")
+	file := utils.OpenFile(filePath)
 	defer file.Close()
 
 	probes, err := explore.Init(file)
