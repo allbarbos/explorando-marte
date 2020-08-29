@@ -97,9 +97,22 @@ func TestInit_InvalidLimits(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			file := utils.OpenFile(tt.file)
 			defer file.Close()
+
 			_, err := explore.Init(file)
 
 			assert.Equal(t, tt.want, err.Error())
 		})
 	}
+}
+
+func TestInit_ValidateLimitError(t *testing.T) {
+	t.Run("when the probe goes out of bounds", func(t *testing.T) {
+		file := utils.OpenFile("./testdata/invalid-plateau-limit.csv")
+		defer file.Close()
+
+		_, err := explore.Init(file)
+
+		assert.NotNil(t, err)
+		assert.Equal(t, "outside the exploration area: x-axis", err.Error())
+	})
 }

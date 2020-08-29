@@ -48,7 +48,12 @@ func Init(file *os.File) ([]p.Probe, error) {
 			x, y, card := co.Coordinates(cmd, probe.GetCardinal())
 
 			probe.Move(card, x, y)
-			limit.Validate(probe)
+
+			err := limit.Validate(probe)
+
+			if err != nil {
+				return nil, err
+			}
 		}
 
 		probes = append(probes, probe)

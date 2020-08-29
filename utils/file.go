@@ -5,10 +5,11 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 )
 
 func OpenFile(path string) *os.File {
-	file, err := os.Open(path)
+	file, err := os.Open(filepath.Clean(path))
 
 	if err != nil {
 		log.Panic("couldn't open file", err)

@@ -5,13 +5,13 @@ import (
 	"explorando-marte/utils"
 	"fmt"
 	"log"
+	"path/filepath"
 )
 
 var filePath string = "input.csv"
 
 func main() {
-	file := utils.OpenFile(filePath)
-	defer file.Close()
+	file := utils.OpenFile(filepath.Clean(filePath))
 
 	probes, err := explore.Init(file)
 
@@ -22,4 +22,6 @@ func main() {
 	for _, p := range probes {
 		fmt.Println(p.GetPosition())
 	}
+
+	_ = file.Close()
 }
