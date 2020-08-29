@@ -11,7 +11,7 @@ func OpenFile(path string) *os.File {
 	file, err := os.Open(path)
 
 	if err != nil {
-		log.Fatalln("couldn't open file", err)
+		log.Panic("couldn't open file", err)
 	}
 
 	return file
@@ -23,7 +23,7 @@ func ReadLine(r *csv.Reader) []string {
 		return nil
 	}
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 	return l
 }
