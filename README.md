@@ -44,3 +44,10 @@ MMRMMRMRRM
 1 3 N
 5 1 E
 ```
+
+# Como rodar
+
+```
+docker build . -t marte
+docker run marte
+```
